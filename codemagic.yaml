@@ -1,0 +1,59 @@
+workflows:
+  ios-app-store:
+    name: Nanawax VIP (cliente) — iOS App Store
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+
+    integrations:
+      app_store_connect: Nanawax App Store Connect  # nom de la clé API à créer dans Codemagic > Settings > Integrations
+
+    environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.nanawax.vip
+      vars:
+        XCODE_PROJECT: "ios/App/App.xcodeproj"
+        XCODE_SCHEME: "App"
+        APP_STORE_APPLE_ID: $APP_STORE_APPLE_ID
+      node: 20.17.0
+
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: main
+          include: true
+
+    scripts:
+      - name: Install Node dependencies
+        script: npm ci
+
+      - name: Add iOS platform (si absente)
+        script: |
+          if [ ! -d "ios" ]; then
+            npx cap add ios
+          fi
+
+      - name: Capacitor sync iOS
+        script: npx cap sync ios
+
+      - name: Set build number
+        script: |
+          BUILD_NUMBER=$(($(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID") + 1))
+          agvtool new-version -all $BUILD_NUMBER
+
+      - name: Build iOS (archive)
+        script: |
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        submit_to_app_store: false
