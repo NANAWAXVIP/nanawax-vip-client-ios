@@ -8,6 +8,9 @@ workflows:
       app_store_connect: Nanawax App Store Connect  # nom de la clé API à créer dans Codemagic > Settings > Integrations
 
     environment:
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: com.nanawax.vip
       vars:
         BUNDLE_ID: "com.nanawax.vip"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
