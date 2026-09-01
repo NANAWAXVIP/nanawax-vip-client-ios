@@ -4,8 +4,11 @@ const config: CapacitorConfig = {
   appId: 'com.nanawax.vip',
   appName: 'Nanawax VIP',
   // Pointe directement sur l'espace client déployé — pas de build statique requis
+  // TEMPORAIRE : app.nanawax.com pointe encore vers une page de parking (DNS non
+  // basculé vers Vercel) — on utilise l'URL Vercel en attendant, à revert une fois
+  // le domaine réparé.
   server: {
-    url: 'https://app.nanawax.com/espace-client',
+    url: 'https://nanawax-boutique.vercel.app/espace-client',
     cleartext: false,
     iosScheme: 'https',
   },
