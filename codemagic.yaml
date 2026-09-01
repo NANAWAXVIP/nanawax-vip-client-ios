@@ -33,6 +33,25 @@ workflows:
             npx cap add ios
           fi
 
+      - name: Cible iOS minimale 15.0 (ITMS-90068)
+        script: |
+          set -e
+          MIN="15.0"
+          sed -i '' "s/IPHONEOS_DEPLOYMENT_TARGET = [0-9.]*;/IPHONEOS_DEPLOYMENT_TARGET = $MIN;/g" ios/App/App.xcodeproj/project.pbxproj
+          if [ -f ios/App/Podfile ]; then
+            sed -i '' "s/^platform :ios, .*/platform :ios, '$MIN'/" ios/App/Podfile
+          fi
+          if [ -f ios/App/CapApp-SPM/Package.swift ]; then
+            sed -i '' "s/\.iOS(\.v[0-9]*)/.iOS(.v15)/" ios/App/CapApp-SPM/Package.swift
+          fi
+          echo "--- vérification ---"
+          grep -n "IPHONEOS_DEPLOYMENT_TARGET" ios/App/App.xcodeproj/project.pbxproj
+          if [ -f ios/App/Podfile ]; then grep -n "^platform :ios" ios/App/Podfile; fi
+          if grep -q "IPHONEOS_DEPLOYMENT_TARGET = 1[0-4]\." ios/App/App.xcodeproj/project.pbxproj; then
+            echo "Une cible < 15.0 subsiste dans project.pbxproj" >&2
+            exit 1
+          fi
+
       - name: Capacitor sync iOS
         script: npx cap sync ios
 
