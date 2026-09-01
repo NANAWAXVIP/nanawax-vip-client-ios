@@ -14,7 +14,6 @@ workflows:
         BUNDLE_ID: "com.nanawax.vip"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
-        APP_STORE_APPLE_ID: $APP_STORE_APPLE_ID
       node: 20.17.0
 
     triggering:
@@ -62,6 +61,7 @@ workflows:
       - name: Set build number
         script: |
           BUILD_NUMBER=$(($(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID") + 1))
+          cd ios/App
           agvtool new-version -all $BUILD_NUMBER
 
       - name: Build iOS (archive)
