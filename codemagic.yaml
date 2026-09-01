@@ -8,10 +8,8 @@ workflows:
       app_store_connect: Nanawax App Store Connect  # nom de la clé API à créer dans Codemagic > Settings > Integrations
 
     environment:
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.nanawax.vip
       vars:
+        BUNDLE_ID: "com.nanawax.vip"
         XCODE_PROJECT: "ios/App/App.xcodeproj"
         XCODE_SCHEME: "App"
         APP_STORE_APPLE_ID: $APP_STORE_APPLE_ID
@@ -36,6 +34,18 @@ workflows:
 
       - name: Capacitor sync iOS
         script: npx cap sync ios
+
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files "$BUNDLE_ID" \
+            --type IOS_APP_STORE \
+            --create
+
+      - name: Set up signing certificate
+        script: keychain initialize
+
+      - name: Set up code signing settings on Xcode project
+        script: xcode-project use-profiles
 
       - name: Set build number
         script: |
