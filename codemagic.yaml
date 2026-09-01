@@ -12,7 +12,7 @@ workflows:
         - ios_signing
       vars:
         BUNDLE_ID: "com.nanawax.vip"
-        XCODE_WORKSPACE: "ios/App/App.xcworkspace" 
+        XCODE_WORKSPACE: "ios/App/App.xcworkspace"
         XCODE_SCHEME: "App"
       node: 20.17.0
 
@@ -64,11 +64,56 @@ workflows:
           cd ios/App
           agvtool new-version -all $BUILD_NUMBER
 
+      - name: Créer le schéma partagé App
+        script: |
+          set -e
+          PROJ="ios/App/App.xcodeproj"
+          SCHEME_DIR="$PROJ/xcshareddata/xcschemes"
+          if [ -f "$SCHEME_DIR/App.xcscheme" ]; then
+            echo "Schéma partagé déjà présent."
+            exit 0
+          fi
+          BP=$(awk '/Begin PBXNativeTarget section/,/End PBXNativeTarget section/' "$PROJ/project.pbxproj" | grep -m1 -E '[0-9A-F]{24} /\* App \*/ = \{' | awk '{print $1}')
+          BP=${BP:-504EC3031FED79650016851F}
+          echo "BlueprintIdentifier de la cible App : $BP"
+          mkdir -p "$SCHEME_DIR"
+          cat > "$SCHEME_DIR/App.xcscheme" <<XML
+          <?xml version="1.0" encoding="UTF-8"?>
+          <Scheme LastUpgradeVersion="1600" version="1.7">
+             <BuildAction parallelizeBuildables="YES" buildImplicitDependencies="YES">
+                <BuildActionEntries>
+                   <BuildActionEntry buildForTesting="YES" buildForRunning="YES" buildForProfiling="YES" buildForArchiving="YES" buildForAnalyzing="YES">
+                      <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="$BP" BuildableName="App.app" BlueprintName="App" ReferencedContainer="container:App.xcodeproj"></BuildableReference>
+                   </BuildActionEntry>
+                </BuildActionEntries>
+             </BuildAction>
+             <TestAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.DebuggerFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv="YES">
+                <Testables></Testables>
+             </TestAction>
+             <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.DebuggerFoundation.Launcher.LLDB" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" debugServiceExtension="internal" allowLocationSimulation="YES">
+                <BuildableProductRunnable runnableDebuggingMode="0">
+                   <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="$BP" BuildableName="App.app" BlueprintName="App" ReferencedContainer="container:App.xcodeproj"></BuildableReference>
+                </BuildableProductRunnable>
+             </LaunchAction>
+             <ProfileAction buildConfiguration="Release" shouldUseLaunchSchemeArgsEnv="YES" savedToolIdentifier="" useCustomWorkingDirectory="NO" debugDocumentVersioning="YES">
+                <BuildableProductRunnable runnableDebuggingMode="0">
+                   <BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="$BP" BuildableName="App.app" BlueprintName="App" ReferencedContainer="container:App.xcodeproj"></BuildableReference>
+                </BuildableProductRunnable>
+             </ProfileAction>
+             <AnalyzeAction buildConfiguration="Debug"></AnalyzeAction>
+             <ArchiveAction buildConfiguration="Release" revealArchiveInOrganizer="YES"></ArchiveAction>
+          </Scheme>
+          XML
+          xcodebuild -project "$PROJ" -list || true
+
       - name: Build iOS (archive)
         script: |
-          xcode-project build-ipa \
-            --workspace "$XCODE_WORKSPACE"
-            --scheme "$XCODE_SCHEME"
+          set -e
+          if [ -d "ios/App/App.xcworkspace" ]; then
+            xcode-project build-ipa --workspace "ios/App/App.xcworkspace" --scheme "$XCODE_SCHEME"
+          else
+            xcode-project build-ipa --project "ios/App/App.xcodeproj" --scheme "$XCODE_SCHEME"
+          fi
 
     artifacts:
       - build/ios/ipa/*.ipa
