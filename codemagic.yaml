@@ -33,6 +33,12 @@ workflows:
             npx cap add ios
           fi
 
+      - name: Générer l'icône de l'app (logo Nanawax)
+        script: |
+          set -e
+          npx @capacitor/assets generate --ios \
+            --iconBackgroundColor '#160800' --iconBackgroundColorDark '#160800'
+
       - name: Déclarer l'app exempte de chiffrement non standard
         script: |
           set -e
