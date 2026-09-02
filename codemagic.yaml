@@ -33,6 +33,15 @@ workflows:
             npx cap add ios
           fi
 
+      - name: Déclarer l'app exempte de chiffrement non standard
+        script: |
+          set -e
+          PLIST="ios/App/App/Info.plist"
+          /usr/libexec/PlistBuddy -c "Delete :ITSAppUsesNonExemptEncryption" "$PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :ITSAppUsesNonExemptEncryption bool false" "$PLIST"
+          echo "--- vérification ---"
+          /usr/libexec/PlistBuddy -c "Print :ITSAppUsesNonExemptEncryption" "$PLIST"
+
       - name: Cible iOS minimale 15.0 (ITMS-90068)
         script: |
           set -e
