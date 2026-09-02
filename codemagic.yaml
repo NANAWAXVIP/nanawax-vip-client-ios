@@ -39,6 +39,14 @@ workflows:
           npx @capacitor/assets generate --ios \
             --iconBackgroundColor '#160800' --iconBackgroundColorDark '#160800'
 
+      - name: Restreindre l'app à iPhone uniquement (pas d'iPad)
+        script: |
+          set -e
+          sed -i '' "s/TARGETED_DEVICE_FAMILY = \"1,2\";/TARGETED_DEVICE_FAMILY = 1;/g" ios/App/App.xcodeproj/project.pbxproj
+          sed -i '' "s/TARGETED_DEVICE_FAMILY = \"1,2\"/TARGETED_DEVICE_FAMILY = 1/g" ios/App/App.xcodeproj/project.pbxproj
+          echo "--- vérification ---"
+          grep -n "TARGETED_DEVICE_FAMILY" ios/App/App.xcodeproj/project.pbxproj
+
       - name: Déclarer l'app exempte de chiffrement non standard
         script: |
           set -e
