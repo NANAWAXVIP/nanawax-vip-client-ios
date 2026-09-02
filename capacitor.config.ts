@@ -15,14 +15,14 @@ const config: CapacitorConfig = {
   ios: {
     contentInset: 'always',
     preferredContentMode: 'mobile',
-    backgroundColor: '#160800',
+    backgroundColor: '#E4DACC',
     scrollEnabled: true,
     allowsLinkPreview: false,
   },
   plugins: {
     SplashScreen: {
       launchShowDuration: 1500,
-      backgroundColor: '#160800',
+      backgroundColor: '#E4DACC',
       showSpinner: false,
       iosSpinnerStyle: 'small',
     },
