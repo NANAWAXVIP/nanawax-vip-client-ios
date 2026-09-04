@@ -60,13 +60,12 @@ workflows:
         script: |
           set -e
           PLIST="ios/App/App/Info.plist"
-          add_string() {
-            /usr/libexec/PlistBuddy -c "Delete :$1" "$PLIST" 2>/dev/null || true
-            /usr/libexec/PlistBuddy -c "Add :$1 string \"$2\"" "$PLIST"
-          }
-          add_string NSCameraUsageDescription "Nanawax VIP a besoin d'accéder à l'appareil photo pour ajouter une photo à votre profil ou à votre galerie."
-          add_string NSPhotoLibraryUsageDescription "Nanawax VIP a besoin d'accéder à vos photos pour ajouter une photo à votre profil ou à votre galerie."
-          add_string NSPhotoLibraryAddUsageDescription "Nanawax VIP a besoin d'enregistrer des photos dans votre photothèque."
+          /usr/libexec/PlistBuddy -c "Delete :NSCameraUsageDescription" "$PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSCameraUsageDescription string Nanawax VIP a besoin de votre appareil photo pour ajouter une photo a votre profil ou a votre galerie." "$PLIST"
+          /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryUsageDescription" "$PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryUsageDescription string Nanawax VIP a besoin de vos photos pour ajouter une photo a votre profil ou a votre galerie." "$PLIST"
+          /usr/libexec/PlistBuddy -c "Delete :NSPhotoLibraryAddUsageDescription" "$PLIST" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :NSPhotoLibraryAddUsageDescription string Nanawax VIP enregistre une photo dans votre phototheque." "$PLIST"
           echo "--- vérification ---"
           /usr/libexec/PlistBuddy -c "Print :NSCameraUsageDescription" "$PLIST"
           /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryUsageDescription" "$PLIST"
