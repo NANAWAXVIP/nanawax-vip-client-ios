@@ -56,6 +56,22 @@ workflows:
           echo "--- vérification ---"
           /usr/libexec/PlistBuddy -c "Print :ITSAppUsesNonExemptEncryption" "$PLIST"
 
+      - name: Déclarer les permissions caméra / photothèque (évite un crash à l'usage)
+        script: |
+          set -e
+          PLIST="ios/App/App/Info.plist"
+          add_string() {
+            /usr/libexec/PlistBuddy -c "Delete :$1" "$PLIST" 2>/dev/null || true
+            /usr/libexec/PlistBuddy -c "Add :$1 string \"$2\"" "$PLIST"
+          }
+          add_string NSCameraUsageDescription "Nanawax VIP a besoin d'accéder à l'appareil photo pour ajouter une photo à votre profil ou à votre galerie."
+          add_string NSPhotoLibraryUsageDescription "Nanawax VIP a besoin d'accéder à vos photos pour ajouter une photo à votre profil ou à votre galerie."
+          add_string NSPhotoLibraryAddUsageDescription "Nanawax VIP a besoin d'enregistrer des photos dans votre photothèque."
+          echo "--- vérification ---"
+          /usr/libexec/PlistBuddy -c "Print :NSCameraUsageDescription" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryUsageDescription" "$PLIST"
+          /usr/libexec/PlistBuddy -c "Print :NSPhotoLibraryAddUsageDescription" "$PLIST"
+
       - name: Cible iOS minimale 15.0 (ITMS-90068)
         script: |
           set -e
