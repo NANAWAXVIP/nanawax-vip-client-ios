@@ -2,9 +2,9 @@
 
 Wrapper Capacitor iOS pour l'app cliente Nanawax VIP (carte de fidélité, QR code, points VIP).
 
-Pointe vers `https://app.nanawax.com/espace-client` — le code source du site (Next.js) vit dans le repo `nanawax-boutique`. Ce dépôt ne contient que la coquille native iOS.
+Pointe vers `https://nanawax-boutique.vercel.app/espace-client` (temporaire : `app.nanawax.com` pointe encore vers une page de parking, DNS jamais basculé vers Vercel — à corriger un jour puis revert ce lien) — le code source du site (Next.js) vit dans le repo `nanawax-boutique`. Ce dépôt ne contient que la coquille native iOS.
 
-Équivalent Android déjà en review sur le Play Store (bundle `com.nanawax.vip`, projet `nanawax-boutique-twa`) — **ce dépôt est indépendant et ne touche pas à cette soumission Android**.
+Équivalent Android (bundle `com.nanawax.vip`, projet `nanawax-boutique-twa`) — **ce dépôt est indépendant et ne touche pas à cette soumission Android**.
 
 ## Build
 
