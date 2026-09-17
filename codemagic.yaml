@@ -116,10 +116,15 @@ workflows:
       - name: Set up code signing settings on Xcode project
         script: xcode-project use-profiles
 
-      - name: Set build number
+      - name: Set version + build number
         script: |
-          BUILD_NUMBER=$(($(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID") + 1))
+          set -e
           cd ios/App
+          # La version 1.0 est déjà publiée sur l'App Store — Apple ferme définitivement
+          # une version une fois publiée et refuse tout nouveau build sous ce même numéro
+          # ("Invalid Pre-Release Train"). On passe donc à 1.1 pour ce prochain envoi.
+          agvtool new-marketing-version 1.1
+          BUILD_NUMBER=$(($(app-store-connect get-latest-build-number "$APP_STORE_APPLE_ID") + 1))
           agvtool new-version -all $BUILD_NUMBER
 
       - name: Créer le schéma partagé App
