@@ -7,8 +7,12 @@ const config: CapacitorConfig = {
   // TEMPORAIRE : app.nanawax.com pointe encore vers une page de parking (DNS non
   // basculé vers Vercel) — on utilise l'URL Vercel en attendant, à revert une fois
   // le domaine réparé.
+  // Pointe directement sur /accueil (et non /espace-client) pour éviter un aller-retour
+  // réseau complet à chaque ouverture : la page racine ne fait que vérifier la session
+  // puis rediriger vers /accueil quand la cliente est déjà connectée (cas normal).
+  // /accueil renvoie elle-même vers /espace-client si la session est absente/expirée.
   server: {
-    url: 'https://nanawax-boutique.vercel.app/espace-client',
+    url: 'https://nanawax-boutique.vercel.app/espace-client/accueil',
     cleartext: false,
     iosScheme: 'https',
   },

@@ -33,11 +33,12 @@ workflows:
             npx cap add ios
           fi
 
-      - name: Générer l'icône de l'app (logo Nanawax)
+      - name: Générer l'icône + l'écran de lancement (logo Nanawax)
         script: |
           set -e
           npx @capacitor/assets generate --ios \
-            --iconBackgroundColor '#160800' --iconBackgroundColorDark '#160800'
+            --iconBackgroundColor '#160800' --iconBackgroundColorDark '#160800' \
+            --splashBackgroundColor '#E4DACC' --splashBackgroundColorDark '#E4DACC'
 
       - name: Restreindre l'app à iPhone uniquement (pas d'iPad)
         script: |
