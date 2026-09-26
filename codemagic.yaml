@@ -91,6 +91,37 @@ workflows:
             exit 1
           fi
 
+      - name: Activer les notifications push (entitlement + Background Modes)
+        script: |
+          set -e
+          ENTITLEMENTS="ios/App/App/App.entitlements"
+          cat > "$ENTITLEMENTS" <<'PLIST'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+          	<key>aps-environment</key>
+          	<string>production</string>
+          </dict>
+          </plist>
+          PLIST
+
+          PROJ="ios/App/App.xcodeproj/project.pbxproj"
+          if ! grep -q "CODE_SIGN_ENTITLEMENTS" "$PROJ"; then
+            sed -i '' '/IPHONEOS_DEPLOYMENT_TARGET = 15.0;/a\
+          				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
+          ' "$PROJ"
+          fi
+          echo "--- vérification entitlements ---"
+          grep -n "CODE_SIGN_ENTITLEMENTS" "$PROJ"
+
+          PLIST_INFO="ios/App/App/Info.plist"
+          /usr/libexec/PlistBuddy -c "Delete :UIBackgroundModes" "$PLIST_INFO" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes array" "$PLIST_INFO"
+          /usr/libexec/PlistBuddy -c "Add :UIBackgroundModes:0 string remote-notification" "$PLIST_INFO"
+          echo "--- vérification Info.plist ---"
+          /usr/libexec/PlistBuddy -c "Print :UIBackgroundModes" "$PLIST_INFO"
+
       - name: Capacitor sync iOS
         script: npx cap sync ios
 
