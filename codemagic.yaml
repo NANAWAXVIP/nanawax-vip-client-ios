@@ -30,7 +30,12 @@ workflows:
       - name: Add iOS platform (si absente)
         script: |
           if [ ! -d "ios" ]; then
-            npx cap add ios
+            # Le pod install auto-déclenché ici peut échouer (OneSignal exige iOS 15,
+            # la cible par défaut du scaffold Capacitor est plus basse) — sans gravité :
+            # le dossier ios/ est déjà créé à ce stade, et l'étape "Cible iOS minimale
+            # 15.0" plus bas corrige le Podfile avant le vrai pod install (cap sync).
+            npx cap add ios || true
+            test -d ios/App/App.xcodeproj
           fi
 
       - name: Générer l'icône + l'écran de lancement (logo Nanawax)
