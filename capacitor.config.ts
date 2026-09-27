@@ -15,6 +15,12 @@ const config: CapacitorConfig = {
     url: 'https://nanawax-boutique.vercel.app/espace-client/accueil',
     cleartext: false,
     iosScheme: 'https',
+    // Sans ça, Capacitor ne considère "interne" que les URLs commençant
+    // littéralement par server.url (donc par /espace-client/accueil) — toute
+    // navigation vers un autre chemin du même site (ex: /espace-client en cas
+    // de session expirée) est alors traitée comme un lien externe et éjecte
+    // l'utilisateur vers Safari.
+    allowNavigation: ['nanawax-boutique.vercel.app'],
   },
   ios: {
     contentInset: 'always',
